@@ -1,5 +1,5 @@
 import express from 'express';
-import { menu, usuarios, pedidos } from './data.js';
+import { menu, usuarios, pedidos, reserva } from './data.js';
 
 const app = express();
 const PORT = 3000;
@@ -15,6 +15,58 @@ app.get('/', (req, res) => {
 // Endpoint para obtener el catálogo completo de Food DEI
 app.get('/api/menu', (req, res) => {
     res.json(menu);
+});
+
+// Endpoint para consultar la reserva actual del cliente
+app.get('/api/reserva', (req, res) => {
+    res.json(reserva);
+});
+
+// Endpoint para agregar alimentos a la reserva
+app.post('/api/reserva/agregar', (req, res) => {
+    const { alimentoId, cantidad } = req.body || {};
+
+    // Validar que los datos sean números enteros positivos
+    if (!Number.isInteger(alimentoId) || !Number.isInteger(cantidad) || cantidad <= 0) {
+        return res.status(400).json({ mensaje: 'Datos invalidos' });
+    }
+
+    // Buscar el alimento en el menú
+    const alimento = menu.find(plato => plato.id === alimentoId);
+
+    if (!alimento) {
+        return res.status(404).json({ mensaje: 'Alimento no encontrado' });
+    }
+
+    // Verificar si hay suficientes porciones
+    if (alimento.stock < cantidad) {
+        return res.status(400).json({ mensaje: 'Stock insuficiente' });
+    }
+
+    // Calcular el costo y verificar el saldo
+    const costo = Math.round(alimento.precio * cantidad * 100) / 100;
+
+    if (costo > reserva.saldo) {
+        return res.status(400).json({ mensaje: 'Saldo insuficiente' });
+    }
+
+    // Buscar si el alimento ya está en la reserva
+    const itemReservado = reserva.itemsReservados.find(
+        item => item.id === alimentoId
+    );
+
+    if (itemReservado) {
+        itemReservado.cantidad += cantidad;
+    } else {
+        reserva.itemsReservados.push({ id: alimentoId, cantidad });
+    }
+
+    // Actualizar el stock, el total y el saldo
+    alimento.stock -= cantidad;
+    reserva.total = Math.round((reserva.total + costo) * 100) / 100;
+    reserva.saldo = Math.round((reserva.saldo - costo) * 100) / 100;
+
+    res.json(reserva);
 });
 
 // Endpoint para validar el inicio de sesión
