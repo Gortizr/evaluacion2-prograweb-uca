@@ -30,3 +30,10 @@ export const menu = [
 
 // Historial de pedidos (inicia vacío como una tabla nueva)
 export const pedidos = [];
+
+// Reserva actual del cliente
+export const reserva = {
+    saldo: 25.00,
+    itemsReservados: [],
+    total: 0
+};
