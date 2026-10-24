@@ -1,5 +1,5 @@
 import express from 'express';
-import { menu, usuarios } from './data.js';
+import { menu, usuarios, pedidos } from './data.js';
 
 const app = express();
 const PORT = 3000;
@@ -32,6 +32,20 @@ app.post('/api/login', (req, res) => {
         // Si fallan, devolvemos un error 401 (No autorizado)
         res.status(401).json({ exito: false, mensaje: 'Usuario o contraseña incorrectos' });
     }
+});
+
+// Endpoint para registrar un nuevo pedido
+app.post('/api/pedidos', (req, res) => {
+    const nuevoPedido = req.body;
+
+    // Simulamos un ID autoincrementable para la base de datos
+    nuevoPedido.id = pedidos.length + 1;
+    
+    // Insertamos el registro en nuestra tabla en memoria
+    pedidos.push(nuevoPedido);
+
+    // Respondemos con el ticket de confirmación (Status 201: Creado)
+    res.status(201).json({ exito: true, mensaje: 'Pedido registrado con éxito', ticket: nuevoPedido });
 });
 
 // Inicialización del servidor con un Callback
