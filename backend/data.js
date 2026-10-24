@@ -1,0 +1,14 @@
+// Arreglo de usuarios para simular la autenticación
+export const usuarios = [
+    { id: 1, usuario: 'admin', password: '123', rol: 'administrador' }
+];
+
+// Catálogo del restaurante Food DEI
+export const menu = [
+    { id: 1, nombre: 'Chaomein con Camarón', precio: 8.50, categoria: 'Plato Principal', disponible: true },
+    { id: 2, nombre: 'Pizza Grande de Pepperoni', precio: 10.99, categoria: 'Plato Principal', disponible: true },
+    { id: 3, nombre: 'Café Americano', precio: 3.25, categoria: 'Bebida', disponible: true }
+];
+
+// Historial de pedidos (inicia vacío como una tabla nueva)
+export const pedidos = [];
