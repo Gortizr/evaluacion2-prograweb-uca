@@ -69,6 +69,64 @@ app.post('/api/reserva/agregar', (req, res) => {
     res.json(reserva);
 });
 
+// Endpoint para actualizar las porciones de un alimento reservado
+app.put('/api/reserva/actualizar-porciones/:id', (req, res) => {
+    const id = Number(req.params.id);
+    const { cantidad } = req.body || {};
+
+    // Validar que los datos sean correctos
+    if (!Number.isInteger(id) || id <= 0 || !Number.isInteger(cantidad) || cantidad <= 0) {
+        return res.status(400).json({ mensaje: 'Datos invalidos' });
+    }
+
+    // Buscar el alimento dentro de la reserva
+    const itemReservado = reserva.itemsReservados.find(
+        item => item.id === id
+    );
+
+    if (!itemReservado) {
+        return res.status(404).json({ mensaje: 'Alimento no reservado' });
+    }
+
+    // Buscar el alimento en el inventario
+    const alimento = menu.find(plato => plato.id === id);
+
+    if (!alimento) {
+        return res.status(404).json({ mensaje: 'Alimento no encontrado' });
+    }
+
+    // Calcular la diferencia entre las porciones nuevas y las actuales
+    const diferencia = cantidad - itemReservado.cantidad;
+
+    // Validar que haya stock suficiente al aumentar las porciones
+    if (diferencia > 0 && alimento.stock < diferencia) {
+        return res.status(400).json({ mensaje: 'Stock insuficiente' });
+    }
+
+    // Calcular el cambio en el costo de la reserva
+    const cambioCosto = Math.round(diferencia * alimento.precio * 100) / 100;
+
+    // Validar que el cliente tenga saldo suficiente
+    if (diferencia > 0 && cambioCosto > reserva.saldo) {
+        return res.status(400).json({
+            mensaje: 'Saldo insuficiente para esta cantidad'
+        });
+    }
+
+    // Actualizar la cantidad de porciones reservadas
+    itemReservado.cantidad = cantidad;
+
+    // Actualizar el stock disponible
+    alimento.stock -= diferencia;
+
+    // Actualizar el total de la reserva y el saldo del cliente
+    reserva.total = Math.round((reserva.total + cambioCosto) * 100) / 100;
+    reserva.saldo = Math.round((reserva.saldo - cambioCosto) * 100) / 100;
+
+    // Devolver la reserva actualizada
+    res.json(reserva);
+});
+
 // Endpoint para validar el inicio de sesión
 app.post('/api/login', (req, res) => {
     // Extraemos el usuario y contraseña que enviará el frontend
