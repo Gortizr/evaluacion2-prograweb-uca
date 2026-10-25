@@ -127,6 +127,52 @@ app.put('/api/reserva/actualizar-porciones/:id', (req, res) => {
     res.json(reserva);
 });
 
+// Endpoint para eliminar un alimento de la reserva
+app.delete('/api/reserva/eliminar/:id', (req, res) => {
+    const id = Number(req.params.id);
+
+    // Validar que el ID sea correcto
+    if (!Number.isInteger(id) || id <= 0) {
+        return res.status(400).json({ mensaje: 'Datos invalidos' });
+    }
+
+    // Buscar el alimento dentro de la reserva
+    const itemReservado = reserva.itemsReservados.find(
+        item => item.id === id
+    );
+
+    if (!itemReservado) {
+        return res.status(404).json({ mensaje: 'Alimento no reservado' });
+    }
+
+    // Buscar el alimento en el menú
+    const alimento = menu.find(plato => plato.id === id);
+
+    if (!alimento) {
+        return res.status(404).json({ mensaje: 'Alimento no encontrado' });
+    }
+
+    // Calcular el dinero que se devolverá al cliente
+    const costoDevuelto = Math.round(
+        alimento.precio * itemReservado.cantidad * 100
+    ) / 100;
+
+    // Devolver las porciones al inventario
+    alimento.stock += itemReservado.cantidad;
+
+    // Devolver el dinero al saldo y actualizar el total
+    reserva.saldo = Math.round((reserva.saldo + costoDevuelto) * 100) / 100;
+    reserva.total = Math.round((reserva.total - costoDevuelto) * 100) / 100;
+
+    // Eliminar el alimento del arreglo de productos reservados
+    reserva.itemsReservados = reserva.itemsReservados.filter(
+        item => item.id !== id
+    );
+
+    // Devolver la reserva actualizada
+    res.json(reserva);
+});
+
 // Endpoint para validar el inicio de sesión
 app.post('/api/login', (req, res) => {
     // Extraemos el usuario y contraseña que enviará el frontend
