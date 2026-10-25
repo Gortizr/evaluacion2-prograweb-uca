@@ -1,8 +1,3 @@
-// Arreglo de usuarios para simular la autenticación
-export const usuarios = [
-    { id: 1, usuario: 'admin', password: '123', rol: 'administrador' }
-];
-
 // Catálogo del restaurante Food DEI
 export const menu = [
     {
@@ -27,9 +22,6 @@ export const menu = [
         stock: 20
     }
 ];
-
-// Historial de pedidos (inicia vacío como una tabla nueva)
-export const pedidos = [];
 
 // Reserva actual del cliente
 export const reserva = {
