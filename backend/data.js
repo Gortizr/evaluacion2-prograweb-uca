@@ -27,5 +27,7 @@ export const menu = [
 export const reserva = {
     saldo: 25.00,
     itemsReservados: [],
-    total: 0
+    total: 0,
+    estado: 'sin iniciar',
+    venceEn: null
 };
