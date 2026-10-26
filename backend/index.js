@@ -1,6 +1,57 @@
 import express from 'express';
 import { menu, reserva } from './data.js';
 
+const TIEMPO_RESERVA_MS = 5 * 60 * 1000;
+
+// Inicia el tiempo límite de una reserva
+function iniciarReserva() {
+    reserva.estado = 'activa';
+
+    const vencimiento = new Date(
+        Date.now() + TIEMPO_RESERVA_MS
+    ).toISOString();
+
+    reserva.venceEn = vencimiento;
+
+    // Cancelar automáticamente si no se confirma en 5 minutos
+    setTimeout(() => {
+        if (
+            reserva.estado === 'activa' &&
+            reserva.venceEn === vencimiento
+        ) {
+            vencerReserva();
+        }
+    }, TIEMPO_RESERVA_MS);
+}
+
+// Cancela una reserva cuando se agota el tiempo
+function vencerReserva() {
+    // Solo pueden vencer las reservas activas
+    if (reserva.estado !== 'activa') {
+        return;
+    }
+
+    // Devolver las porciones al inventario
+    for (const item of reserva.itemsReservados) {
+        const alimento = menu.find(plato => plato.id === item.id);
+
+        if (alimento) {
+            alimento.stock += item.cantidad;
+        }
+    }
+
+    // Devolver el dinero al saldo del cliente
+    reserva.saldo = Math.round(
+        (reserva.saldo + reserva.total) * 100
+    ) / 100;
+
+    // Limpiar los alimentos y cerrar la reserva
+    reserva.itemsReservados = [];
+    reserva.total = 0;
+    reserva.estado = 'vencida';
+    reserva.venceEn = null;
+}
+
 const app = express();
 const PORT = 3000;
 
@@ -22,8 +73,60 @@ app.get('/api/reserva', (req, res) => {
     res.json(reserva);
 });
 
+// Endpoint para confirmar la reserva del cliente
+app.post('/api/reserva/confirmar', (req, res) => {
+
+    // Verificar que exista una reserva activa
+    if (reserva.estado !== 'activa') {
+        return res.status(400).json({
+            mensaje: 'No hay una reserva activa para confirmar'
+        });
+    }
+
+    // Verificar que no hayan pasado los 5 minutos
+    if (Date.now() >= new Date(reserva.venceEn).getTime()) {
+        vencerReserva();
+
+        return res.status(410).json({
+            mensaje: 'La reserva ha vencido'
+        });
+    }
+
+    // Verificar que haya alimentos reservados
+    if (reserva.itemsReservados.length === 0) {
+        return res.status(400).json({
+            mensaje: 'No hay alimentos para confirmar'
+        });
+    }
+
+    // Confirmar la reserva
+    reserva.estado = 'confirmada';
+    reserva.venceEn = null;
+
+    res.json({
+        mensaje: 'Reserva confirmada correctamente',
+        reserva
+    });
+});
+
 // Endpoint para agregar alimentos a la reserva
 app.post('/api/reserva/agregar', (req, res) => {
+
+    // Impedir modificaciones después de confirmar la reserva
+    if (reserva.estado === 'confirmada') {
+        return res.status(409).json({
+            mensaje: 'La reserva ya fue confirmada y no se puede modificar'
+        });
+    }
+
+    // Comprobar si una reserva activa ya superó su tiempo límite
+    if (
+        reserva.estado === 'activa' &&
+        Date.now() >= new Date(reserva.venceEn).getTime()
+    ) {
+        vencerReserva();
+    }
+
     const { alimentoId, cantidad } = req.body || {};
 
     // Validar que los datos sean números enteros positivos
@@ -61,6 +164,11 @@ app.post('/api/reserva/agregar', (req, res) => {
         reserva.itemsReservados.push({ id: alimentoId, cantidad });
     }
 
+    // Iniciar los 5 minutos solamente al comenzar una reserva
+    if (reserva.estado === 'sin iniciar' || reserva.estado === 'vencida') {
+    iniciarReserva();
+    }
+
     // Actualizar el stock, el total y el saldo
     alimento.stock -= cantidad;
     reserva.total = Math.round((reserva.total + costo) * 100) / 100;
@@ -71,6 +179,26 @@ app.post('/api/reserva/agregar', (req, res) => {
 
 // Endpoint para actualizar las porciones de un alimento reservado
 app.put('/api/reserva/actualizar-porciones/:id', (req, res) => {
+
+    // Comprobar si la reserva ha vencido
+    if (
+        reserva.estado === 'activa' &&
+        Date.now() >= new Date(reserva.venceEn).getTime()
+    ) {
+        vencerReserva();
+
+        return res.status(410).json({
+            mensaje: 'La reserva ha vencido'
+        });
+    }
+
+    // Solo se pueden modificar reservas activas
+    if (reserva.estado !== 'activa') {
+        return res.status(409).json({
+            mensaje: 'Solo se puede modificar una reserva activa'
+        });
+    }
+
     const id = Number(req.params.id);
     const { cantidad } = req.body || {};
 
@@ -129,6 +257,26 @@ app.put('/api/reserva/actualizar-porciones/:id', (req, res) => {
 
 // Endpoint para eliminar un alimento de la reserva
 app.delete('/api/reserva/eliminar/:id', (req, res) => {
+
+    // Comprobar si la reserva ha vencido
+    if (
+        reserva.estado === 'activa' &&
+        Date.now() >= new Date(reserva.venceEn).getTime()
+    ) {
+        vencerReserva();
+
+        return res.status(410).json({
+            mensaje: 'La reserva ha vencido'
+        });
+    }
+
+    // Solo se pueden eliminar alimentos de reservas activas
+    if (reserva.estado !== 'activa') {
+        return res.status(409).json({
+            mensaje: 'Solo se pueden eliminar alimentos de una reserva activa'
+        });
+    }
+
     const id = Number(req.params.id);
 
     // Validar que el ID sea correcto
@@ -168,6 +316,12 @@ app.delete('/api/reserva/eliminar/:id', (req, res) => {
     reserva.itemsReservados = reserva.itemsReservados.filter(
         item => item.id !== id
     );
+
+    // Reiniciar la reserva si el cliente eliminó todos los alimentos
+    if (reserva.itemsReservados.length === 0) {
+    reserva.estado = 'sin iniciar';
+    reserva.venceEn = null;
+    }
 
     // Devolver la reserva actualizada
     res.json(reserva);
