@@ -24,6 +24,7 @@
   font-size: 38px;
   font-weight: bold;
   margin: 0 0 12px;
+  color:#1e293b;
 }
 
 .inicio-descripcion {
@@ -64,6 +65,7 @@
   font-size: 22px;
   font-weight: bold;
   margin: 14px 0 10px;
+  color:#1e293b;
 }
 
 .inicio-tarjeta p {
@@ -90,6 +92,7 @@
 
   .inicio h1 {
     font-size: 30px;
+    color:#1e293b;
   }
 
   .inicio-tarjeta p {
