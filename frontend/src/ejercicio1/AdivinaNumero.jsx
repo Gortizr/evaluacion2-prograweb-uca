@@ -29,6 +29,7 @@ function AdivinaNumero() {
   // useEffect se ejecuta cuando se muestra este componente por primera vez.
   useEffect(() => {
     document.title = 'Ejercicio 1 - Adivina el Número';
+    fetch('/reset', { method: 'POST' });
   }, []);
 
   // Se ejecuta al presionar el botón "Probar número" del formulario.
