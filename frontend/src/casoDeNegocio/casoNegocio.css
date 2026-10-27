@@ -20,7 +20,7 @@
   font-size: 22px;
   font-weight: bold;
   margin: 0;
-  color:black;
+   color: #1e293b;
 }
 
 .caso-negocio .caso-negocio__resumen {
@@ -37,6 +37,7 @@
 .caso-negocio .caso-negocio__subtitulo {
   font-size: 19px;
   margin: 12px 0 16px;
+   color: #1e293b;
 }
 
 .caso-negocio .card {
@@ -48,6 +49,7 @@
 .caso-negocio .card h5 {
   font-size: 17px;
   font-weight: bold;
+  color: #1e293b;
 }
 
 .caso-negocio .caso-negocio__item {
