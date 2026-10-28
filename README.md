@@ -77,3 +77,11 @@ Separación de responsabilidades: Uso de fetch y promesas (async/await) en el Fr
 Códigos de Estado HTTP: Manejo estricto de errores (400 Bad Request, 404 Not Found) desde el Backend, capturados y mostrados al usuario con alertas de Reactstrap.
 
 React Hooks: Implementación extensa de useState y useEffect para controlar la renderización condicional y las llamadas iniciales a la API.
+
+## Declaración de Uso de Inteligencia Artificial
+
+Durante el ciclo de desarrollo y preparación de esta Evaluación II, el equipo utilizó **ChatGPT** como asistente de inteligencia artificial. Su aplicación se limitó estrictamente a las siguientes tareas de apoyo:
+* **Revisión técnica:** Análisis de sintaxis, depuración de errores y explicación del flujo de datos entre el Backend (Express) y el Frontend (React).
+* **Documentación:** Estructuración y redacción de los comandos de despliegue en este archivo `README.md`.
+
+Toda la arquitectura, lógica de negocio y código final fueron construidos, comprendidos y validados por los autores del equipo para garantizar el cumplimiento de las rúbricas de la asignatura.
