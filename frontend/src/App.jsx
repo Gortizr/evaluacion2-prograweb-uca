@@ -1,122 +1,74 @@
-import { useState } from 'react'
-import heroImg from './assets/hero.png'
-import reactLogo from './assets/react.svg'
-import viteLogo from './assets/vite.svg'
-import './App.css'
+// useState permite recordar qué pantalla eligió el usuario.
+import { useState } from 'react';
+
+// Importamos los dos ejercicios que ya existen en el proyecto.
+import AdivinaNumero from './ejercicio1/AdivinaNumero.jsx';
+import CasoDeNegocio from './casoDeNegocio/casoNegocio.jsx';
+
+// Aquí están los estilos de la pantalla de inicio.
+import './App.css';
 
 function App() {
-  const [count, setCount] = useState(0)
+  // Al abrir la página se muestra primero el inicio.
+  const [pantalla, setPantalla] = useState('inicio');
 
   return (
-    <>
-      <section id="center">
-        <div className="hero">
-          <img src={heroImg} className="base" width="170" height="179" alt="" />
-          <img src={reactLogo} className="framework" alt="React logo" />
-          <img src={viteLogo} className="vite" alt="Vite logo" />
-        </div>
-        <div>
-          <h1>Get started</h1>
-          <p>
-            Edit <code>src/App.jsx</code> and save to test <code>HMR</code>
-          </p>
-        </div>
-        <button
-          type="button"
-          className="counter"
-          onClick={() => setCount((count) => count + 1)}
-        >
-          Count is {count}
-        </button>
-      </section>
+    <div>
+      {/* Si pantalla es "inicio", mostramos las dos opciones. */}
+      {pantalla === 'inicio' ? (
+        <main className="inicio">
+          <div className="inicio-contenido">
+            <p className="inicio-etiqueta">Evaluación II · Programación Web</p>
+            <h1>¿Qué deseas hacer?</h1>
+            <p className="inicio-descripcion">
+              Selecciona uno de los dos ejercicios para comenzar.
+            </p>
 
-      <div className="ticks"></div>
+            <div className="inicio-opciones">
+              {/* Botón que abre el ejercicio 1. */}
+              <button
+                type="button"
+                className="inicio-tarjeta"
+                onClick={() => setPantalla('numero')}
+              >
+                <span className="inicio-numero">01</span>
+                <h2>Adivina el Número</h2>
+                <p>Intenta encontrar el número secreto del 1 al 100.</p>
+                <span className="inicio-accion">Jugar →</span>
+              </button>
 
-      <section id="next-steps">
-        <div id="docs">
-          <svg className="icon" role="presentation" aria-hidden="true">
-            <use href="/icons.svg#documentation-icon"></use>
-          </svg>
-          <h2>Documentation</h2>
-          <p>Your questions, answered</p>
-          <ul>
-            <li>
-              <a href="https://vite.dev/" target="_blank">
-                <img className="logo" src={viteLogo} alt="" />
-                Explore Vite
-              </a>
-            </li>
-            <li>
-              <a href="https://react.dev/" target="_blank">
-                <img className="button-icon" src={reactLogo} alt="" />
-                Learn more
-              </a>
-            </li>
-          </ul>
-        </div>
-        <div id="social">
-          <svg className="icon" role="presentation" aria-hidden="true">
-            <use href="/icons.svg#social-icon"></use>
-          </svg>
-          <h2>Connect with us</h2>
-          <p>Join the Vite community</p>
-          <ul>
-            <li>
-              <a href="https://github.com/vitejs/vite" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#github-icon"></use>
-                </svg>
-                GitHub
-              </a>
-            </li>
-            <li>
-              <a href="https://chat.vite.dev/" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#discord-icon"></use>
-                </svg>
-                Discord
-              </a>
-            </li>
-            <li>
-              <a href="https://x.com/vite_js" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#x-icon"></use>
-                </svg>
-                X.com
-              </a>
-            </li>
-            <li>
-              <a href="https://bsky.app/profile/vite.dev" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#bluesky-icon"></use>
-                </svg>
-                Bluesky
-              </a>
-            </li>
-          </ul>
-        </div>
-      </section>
+              {/* Botón que abre el ejercicio 2 de tu compañero. */}
+              <button
+                type="button"
+                className="inicio-tarjeta"
+                onClick={() => setPantalla('negocio')}
+              >
+                <span className="inicio-numero">02</span>
+                <h2>Food DEI</h2>
+                <p>Elige platillos y administra tu reserva de comida.</p>
+                <span className="inicio-accion">Entrar →</span>
+              </button>
+            </div>
+          </div>
+        </main>
+      ) : (
+        <main className="vista-ejercicio">
+          {/* Permite regresar a la pantalla principal. */}
+          <button
+            type="button"
+            className="btn btn-outline-secondary mb-4"
+            onClick={() => setPantalla('inicio')}
+          >
+            ← Volver al inicio
+          </button>
 
-      <div className="ticks"></div>
-      <section id="spacer"></section>
-    </>
-  )
+          {/* Mostramos solo el ejercicio que eligió el usuario. */}
+          {pantalla === 'numero' ? <AdivinaNumero /> : <CasoDeNegocio />}
+        </main>
+      )}
+    </div>
+  );
 }
 
-export default App
+// Permite que main.jsx muestre esta aplicación.
+export default App;

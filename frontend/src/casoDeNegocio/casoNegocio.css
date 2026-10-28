@@ -1,0 +1,66 @@
+/* Estilos exclusivos de casoNegocio.jsx: todo empieza con .caso-negocio,
+   así no afectan al ejercicio 1. */
+.caso-negocio {
+  max-width: 1100px;
+  margin: 0 auto;
+}
+
+.caso-negocio .caso-negocio__panel {
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+}
+
+.caso-negocio .caso-negocio__titulo {
+  font-size: 22px;
+  font-weight: bold;
+  margin: 0;
+   color: #1e293b;
+}
+
+.caso-negocio .caso-negocio__resumen {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 16px;
+}
+
+.caso-negocio .caso-negocio__cargando {
+  font-style: italic;
+}
+
+.caso-negocio .caso-negocio__subtitulo {
+  font-size: 19px;
+  margin: 12px 0 16px;
+   color: #1e293b;
+}
+
+.caso-negocio .card {
+  height: calc(100% - 1rem);
+  border: 1px solid #e3e8df;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06);
+}
+
+.caso-negocio .card h5 {
+  font-size: 17px;
+  font-weight: bold;
+  color: #1e293b;
+}
+
+.caso-negocio .caso-negocio__item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 8px;
+}
+
+.caso-negocio .caso-negocio__controles {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
